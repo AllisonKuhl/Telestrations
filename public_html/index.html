@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+<head>
+<meta charset = "utf8"/>
+<title>Telephone Pictionary</title>
+<script src="/socket.io/socket.io.js"></script>
+<link rel = "stylesheet" type = "text/css" href="style.css"/>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="game.js"></script> 
+</head>
+
+<header><h1 id = "title"> Welcome to Telestrations!</h1></header>
+<body>
+	<div id = "preGame">
+		<div id = "userMessage"><button id = "joinGame">JOIN GAME</button></div>
+		<div id = "gameStartCoundown"></div>
+		<div id = "userListDiv">
+				<label>Players Present:</label>
+				<ul id = "userList"></ul>
+		</div>
+	</div>
+	<div id = "message"></div>
+	<div id = "game" style="display:none;">
+		<div id = "blocks">
+			<div class = "block" id = "block1"></div>
+			<div class = "block" id = "block2"></div>
+		</div>
+		<button id = "submitPage">Submit</button>
+	</div>
+
+</body>
+</html>
+
+

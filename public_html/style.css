@@ -1,0 +1,51 @@
+
+#blocks{
+	display:flex;
+}
+
+.block {
+	border: 2px solid black;
+	width:400px;
+	height:300px;
+	margin:10px;
+}
+
+#game button {
+	display:block;
+	margin-left:400px;
+	
+}
+
+#userListDiv label {
+	text-decoration:underline;
+	font-weight:bold;
+}
+
+
+textarea{
+	width:95%;
+	height:80%;
+}
+
+.userlist{
+	list-style-type:none;
+	padding:20px;
+}
+/*
+canvas {
+	width: 700px;
+	height: 500px;
+	border: 5px solid black;
+	float: left:
+}
+*/
+ 
+ 
+ 
+ 
+ 
+
+
+
+
+

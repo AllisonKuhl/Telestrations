@@ -1,0 +1,19 @@
+{
+  "name": "mychat",
+  "version": "1.0.0",
+  "description": "let's hang out!",
+  "main": "app.js",
+  "directories": {
+    "example": "example"
+  },
+  "dependencies": {
+    "express": "^4.16.4",
+    "socket.io": "^1.5.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Allison Kuhl",
+  "license": "ISC"
+}
