@@ -137,17 +137,19 @@ io.on("connection", function(socket){
 			cardQueue: [],
 			currentCard: null,
 			addCard: function (creator,prev,data) {
-				let card = new Card(creator,prev,data.description,data.type);
+				
+				//console.log("Adding new card from " + creator +"to me, " + this.name);
+				
+				let card = new Card(creator,prev,data.type,data.description);
 				this.cardQueue.push(card);
 				if(this.currentCard===null&&this.cardQueue[0]!=undefined){
-					//io.to(`${socketId}`).emit('hey', 'I just met you'); ??
 					socket.emit("nextCard",this.cardQueue[0]);
-					this.currentCard = this.cardQueue.shift();
+					this.currentCard = this.cardQueue.pop();
 				}			
 			},
-			getNextCard: function(){			
+			getNextCard: function(){
 				if(this.cardQueue[0]!=undefined){
-					this.currentCard = this.cardQueue.shift();
+					this.currentCard = this.cardQueue.pop();
 					socket.emit("nextCard",this.currentCard);
 				}else{
 					this.currentCard = null;
@@ -170,6 +172,14 @@ io.on("connection", function(socket){
 		   sendCardToNextUser(socket.id,data)
 	  });
 	  
+	   socket.on("requestNextCard",function(data){
+		   for(var i=0;i<players.length;i++){
+				if(players[i].id === socket.id){	
+					players[i].getNextCard();			
+				}
+		   }			
+			
+	   });
 	  
 	  
 	/*
@@ -281,10 +291,12 @@ function sendCardToNextUser(id,data){
 //and is either a drawing (1) or text (0)
 class Card {
 	
-	constructor(creator, prev,type) {
-		 this.creator = creator;
+	constructor(creator,prev,type,message) {
+		    this.creator = creator;
 			this.prev = prev;
-			 this.type = type;
+			this.type = type;
+			this.description = message;
+			console.log("Creating a card of type" + type + " with message " + message);
 	}
  
  

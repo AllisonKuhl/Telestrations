@@ -51,7 +51,7 @@ function submitPage() {
 		description = canvas.toDataURL();
 		data.type = 1;
 	}else{
-		data.type = 2;
+		data.type = 0;
 	}
 	console.log("we are here");
 	data.description = description;
@@ -88,10 +88,23 @@ function joinGame(){
 
 
 function getNextCard(data){
+	
+	if (GAMESTATE===PLAYING){
+		return;
+	}
 	console.log("GOT NEXT CARD!");
 	console.log(data)
 	GAMESTATE = PLAYING;
 	$("#message").empty();
+	
+	if (data.type === 0){
+		$("#block1").append("<h2>Draw the following description:</h2><p>"+data.description+"</p>")
+		$("#block2").append("<canvas id = 'c'></canvas>")
+	}
+	console.log(data.type)
+	console.log(data.description)
+	
+	
 	$("#game").show();
 	
 	
@@ -100,8 +113,11 @@ function getNextCard(data){
 function setToWaiting(){
 	console.log("waiting for next card");
 	GAMESTATE = WAITINGFORCARD;
+	$("#block1").empty();
+	$("#block2").empty();
 	$("#game").hide();
 	$("#message").append("<p>Waiting...</p>");	
+	socket.emit("requestNextCard");
 }
 
 /*
