@@ -53,11 +53,11 @@ function submitPage() {
 	}else{
 		data.type = 0;
 	}
-	console.log("we are here");
+
 	data.description = description;
 	socket.emit("submission", data);
 	setToWaiting();
-	socket.emit("getNext");
+	
 	
 }
 
@@ -89,7 +89,10 @@ function joinGame(){
 
 function getNextCard(data){
 	
+	console.log("Recieving next card...");
+	
 	if (GAMESTATE===PLAYING){
+		console.log("cannot recieve");
 		return;
 	}
 	console.log("GOT NEXT CARD!");
@@ -116,7 +119,8 @@ function setToWaiting(){
 	$("#block1").empty();
 	$("#block2").empty();
 	$("#game").hide();
-	$("#message").append("<p>Waiting...</p>");	
+	$("#message").append("<p>Waiting...</p>");
+	console.log("Requesting next card");
 	socket.emit("requestNextCard");
 }
 

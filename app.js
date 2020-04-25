@@ -138,21 +138,29 @@ io.on("connection", function(socket){
 			currentCard: null,
 			addCard: function (creator,prev,data) {
 				
-				//console.log("Adding new card from " + creator +"to me, " + this.name);
+				
 				
 				let card = new Card(creator,prev,data.type,data.description);
 				this.cardQueue.push(card);
 				if(this.currentCard===null&&this.cardQueue[0]!=undefined){
 					socket.emit("nextCard",this.cardQueue[0]);
 					this.currentCard = this.cardQueue.pop();
-				}			
+					socket.emit("nextCard",this.currentCard);
+				}
+				
+				//console.log("Adding new card from " + creator +"to me, " + this.name);
+				//console.log(this);
+					
+			},
+			removeCurrent: function(){
+				this.currentCard = null;
 			},
 			getNextCard: function(){
 				if(this.cardQueue[0]!=undefined){
 					this.currentCard = this.cardQueue.pop();
 					socket.emit("nextCard",this.currentCard);
-				}else{
-					this.currentCard = null;
+				}else if (this.currentCard!=null){
+					socket.emit("nextCard",this.currentCard);
 				}
 			}
 		};
@@ -173,8 +181,10 @@ io.on("connection", function(socket){
 	  });
 	  
 	   socket.on("requestNextCard",function(data){
+		   console.log("Recieved request for next card")
 		   for(var i=0;i<players.length;i++){
 				if(players[i].id === socket.id){	
+					//console.log(players[i])
 					players[i].getNextCard();			
 				}
 		   }			
@@ -279,7 +289,7 @@ function sendCardToNextUser(id,data){
 	for(var i=0;i<players.length;i++){
         if(players[i].id === id){
 			let nextId = (i+1)%players.length;
-			players[nextId].addCard(id,players[i].currentCard,data)
+			players[nextId].addCard(id,players[i].currentCard,data);
 			players[i].getNextCard();
 		}
     }	
