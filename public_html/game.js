@@ -100,9 +100,27 @@ function getNextCard(data){
 	GAMESTATE = PLAYING;
 	$("#message").empty();
 	
+	//if we recieve a description
 	if (data.type === 0){
 		$("#block1").append("<h2>Draw the following description:</h2><p>"+data.description+"</p>")
-		$("#block2").append("<canvas id = 'c'></canvas>")
+		$("#block2").append("<canvas id = 'drawCanvas'></canvas>")
+		drawCanvas();		
+	}
+	
+	//if we recieve a drawing
+	if (data.type === 1){
+	 $("#block1").append("<canvas id = 'displayCanvas'></canvas>");
+		var myCanvas = document.getElementById('displayCanvas');
+		var ctx = myCanvas.getContext('2d');
+		var img = new Image;
+		img.src = data.description;
+		img.onload = function(){
+			ctx.drawImage(img,0,0)
+		}
+		$("#block2").append(
+			"<textarea/><p>Please describe what you see!</p>"
+		);
+		
 	}
 	console.log(data.type)
 	console.log(data.description)
@@ -123,6 +141,59 @@ function setToWaiting(){
 	console.log("Requesting next card");
 	socket.emit("requestNextCard");
 }
+
+function drawCanvas(){
+    canvas = document.getElementById('drawCanvas');
+	canvas.width = 400;
+	canvas.height = 300;
+	var context = canvas.getContext('2d');	
+	var mouseDown = false;
+	
+	var brush = {
+		x: -100,
+		y: -100	
+	}
+	
+		document.addEventListener('mousedown', function(event){
+			mouseDown = true;
+			var rect = canvas.getBoundingClientRect()				
+			brush.x = event.x-rect.left;
+			brush.y = event.y-rect.top;
+			brush.prevX = -100
+			brush.prevY = -100
+			console.log(brush)
+		});
+		
+		document.addEventListener('mouseup', function(event){
+			mouseDown = false;
+			brush.x = -100;
+			brush.y = -100;
+		});
+		
+		document.addEventListener('mousemove', function(event){
+			if (mouseDown){
+				var rect = canvas.getBoundingClientRect();
+				brush.prevX = brush.x;
+				brush.prevY = brush.y;
+				brush.x = event.x-rect.left;
+				brush.y = event.y-rect.top;
+				drawing(brush,context);
+			}
+		});
+			
+			
+	
+}
+
+    function drawing(brush,context) {
+			context.beginPath();
+			context.moveTo(brush.prevX,brush.prevY)
+			context.lineWidth = 5;
+			context.lineTo(brush.x,brush.y);
+			context.stroke();
+			context.closePath()	
+    }
+
 
 /*
 function playGame(players){
