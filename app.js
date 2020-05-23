@@ -136,30 +136,51 @@ io.on("connection", function(socket){
 			id: socket.id,
 			cardQueue: [],
 			currentCard: null,
+			firstCard: null,
 			addCard: function (creator,prev,data) {
 				
-				
+				console.log("Adding new card from " + creator +"to me, " + this.name);
 				
 				let card = new Card(creator,prev,data.type,data.description);
 				this.cardQueue.push(card);
+				console.log("PLAYER " + this.name + " cardQueue")
+				for (var i = 0;i<this.cardQueue.length;i++){
+					console.log(this.cardQueue[i].toString())
+				}
+				console.log("Current card: " + this.currentCard)
+				
+				
 				if(this.currentCard===null&&this.cardQueue[0]!=undefined){
 					socket.emit("nextCard",this.cardQueue[0]);
 					this.currentCard = this.cardQueue.pop();
 					socket.emit("nextCard",this.currentCard);
 				}
+				if (this.firstCard===null){
+					this.firstCard = this.currentCard;
+				}
 				
-				//console.log("Adding new card from " + creator +"to me, " + this.name);
+				
+				console.log("PLAYER " + this.name + " cardQueue UPDATED")
+				for (var i = 0;i<this.cardQueue.length;i++){
+					console.log(this.cardQueue[i].toString())
+				}
+				console.log("Current card: " + this.currentCard)
+				
+				
+			
 				//console.log(this);
 					
 			},
 			removeCurrent: function(){
+				console.log("removing current card!")
 				this.currentCard = null;
 			},
 			getNextCard: function(){
-				if(this.cardQueue[0]!=undefined){
-					this.currentCard = this.cardQueue.pop();
+				
+				if (this.currentCard!=null){
 					socket.emit("nextCard",this.currentCard);
-				}else if (this.currentCard!=null){
+				}else if(this.cardQueue[0]!=undefined){
+					this.currentCard = this.cardQueue.pop();
 					socket.emit("nextCard",this.currentCard);
 				}
 			}
@@ -176,7 +197,7 @@ io.on("connection", function(socket){
   
 	  socket.on('submission', function(data) {
 		  console.log("RECIEVED SUBMISSION")
-		   console.log(data);
+		 //  console.log(data);
 		   sendCardToNextUser(socket.id,data)
 	  });
 	  
@@ -191,6 +212,15 @@ io.on("connection", function(socket){
 			
 	   });
 	  
+	  socket.on('recievedCard', function() {
+		  console.log("message from " + socket.id + " that they have recieved a card")
+		   for(var i=0;i<players.length;i++){
+				if(players[i].id === socket.id){	
+					players[i].removeCurrent();			
+				}
+		   }
+		  
+	  });
 	  
 	/*
 	  socket.on('new player', function() {
@@ -291,6 +321,7 @@ function sendCardToNextUser(id,data){
 			let nextId = (i+1)%players.length;
 			players[nextId].addCard(id,players[i].currentCard,data);
 			players[i].getNextCard();
+	
 		}
     }	
 }
@@ -306,9 +337,25 @@ class Card {
 			this.prev = prev;
 			this.type = type;
 			this.description = message;
-			console.log("Creating a card of type" + type + " with message " + message);
+			//console.log("Creating a card of type" + type + " with message " + message);
 	}
  
+ 
+   toString(){
+
+	   var s = "Card by: " + this.creator;
+	   if (this.type ===1){
+		   s+= " type: drawing\n"
+		   s+= "description: "+ this.description.substr(0,10);
+	   }
+	   if (this.type ===0){
+		   s+= " type: text \n"
+		   s+= "description: "+ this.description;
+	   }else{
+		   s+ "ERROR"
+	   }
+	   return s;
+   }
  
    getType() {
     return this.type;

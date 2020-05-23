@@ -1,7 +1,7 @@
 {
-  "name": "mychat",
+  "name": "telestrations",
   "version": "1.0.0",
-  "description": "let's hang out!",
+  "description": "let's play a game together!",
   "main": "app.js",
   "directories": {
     "example": "example"

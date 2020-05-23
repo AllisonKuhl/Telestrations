@@ -112,10 +112,12 @@ function getNextCard(data){
 	 $("#block1").append("<canvas id = 'displayCanvas'></canvas>");
 		var myCanvas = document.getElementById('displayCanvas');
 		var ctx = myCanvas.getContext('2d');
+		myCanvas.width = 400;
+		myCanvas.height = 300;
 		var img = new Image;
 		img.src = data.description;
 		img.onload = function(){
-			ctx.drawImage(img,0,0)
+			ctx.drawImage(img,0,0,400,300)
 		}
 		$("#block2").append(
 			"<textarea/><p>Please describe what you see!</p>"
@@ -125,6 +127,8 @@ function getNextCard(data){
 	console.log(data.type)
 	console.log(data.description)
 	
+	socket.emit("recievedCard");
+	console.log("We have recieved the card!")
 	
 	$("#game").show();
 	
