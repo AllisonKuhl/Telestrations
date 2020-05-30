@@ -137,11 +137,13 @@ io.on("connection", function(socket){
 			cardQueue: [],
 			currentCard: null,
 			firstCard: null,
-			addCard: function (creator,prev,data) {
+			addCard: function (origin,data) {
 				
-				console.log("Adding new card from " + creator +"to me, " + this.name);
+				console.log("Adding new card from " + origin +"to me, " + this.id);
 				
-				let card = new Card(creator,prev,data.type,data.description);
+				console.log("card with this data: " + data);
+				
+				let card = new Card(origin,data.type,data.description);
 				this.cardQueue.push(card);
 				console.log("PLAYER " + this.name + " cardQueue")
 				for (var i = 0;i<this.cardQueue.length;i++){
@@ -166,7 +168,7 @@ io.on("connection", function(socket){
 				}
 				console.log("Current card: " + this.currentCard)
 				
-				
+				return card;
 			
 				//console.log(this);
 					
@@ -177,14 +179,25 @@ io.on("connection", function(socket){
 			},
 			getNextCard: function(){
 				
-				if (this.currentCard!=null){
-					socket.emit("nextCard",this.currentCard);
-				}else if(this.cardQueue[0]!=undefined){
+				if (this.currentCard == null & this.cardQueue[0]!=undefined){
 					this.currentCard = this.cardQueue.pop();
-					socket.emit("nextCard",this.currentCard);
+				}
+				
+				
+				if (this.currentCard != null){
+					console.log("~SENDING CARD~")
+					console.log("My Id: " + this.id)
+					console.log(this.currentCard.toString())
+					if (this.currentCard.origin === this.id){
+						socket.emit("finished",this.currentCard);
+					}else{
+						socket.emit("nextCard",this.currentCard);
+					}
 				}
 			}
 		};
+		
+		console.log(newPlayer.name + " has joined the game with id: " + newPlayer.id);
 		
 		players.push(newPlayer);
 		
@@ -315,11 +328,21 @@ function getUser(username){
 }
 
 function sendCardToNextUser(id,data){
-
+	
+	console.log("recieved data: "+ data);
+	console.log("from socket id: " + id)
 	for(var i=0;i<players.length;i++){
         if(players[i].id === id){
 			let nextId = (i+1)%players.length;
-			players[nextId].addCard(id,players[i].currentCard,data);
+			
+			let prevCard = data.card;
+		
+			if (prevCard!=null){							
+				nextCard = players[nextId].addCard(prevCard.origin,data)				
+				//prevCard.addNext(nextCard);
+			}else{
+				players[nextId].addCard(id,data);
+			}
 			players[i].getNextCard();
 	
 		}
@@ -332,18 +355,20 @@ function sendCardToNextUser(id,data){
 //and is either a drawing (1) or text (0)
 class Card {
 	
-	constructor(creator,prev,type,message) {
-		    this.creator = creator;
-			this.prev = prev;
+	constructor(origin,type,message) {
+		    this.origin = origin;
+			this.next = null;
 			this.type = type;
 			this.description = message;
 			//console.log("Creating a card of type" + type + " with message " + message);
 	}
  
- 
+	addNext(card) {
+		this.next = card;
+	}
    toString(){
 
-	   var s = "Card by: " + this.creator;
+	   var s = "Card by: " + this.origin;
 	   if (this.type ===1){
 		   s+= " type: drawing\n"
 		   s+= "description: "+ this.description.substr(0,10);

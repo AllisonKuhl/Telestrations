@@ -2,7 +2,9 @@ var socket = io();
 var GAMESTATE = 0;
 let PLAYING = 1;
 let WAITINGFORCARD = 2;
+let GAMEOVER = 3;
 var waitingRoomGameLoop = null;
+let currentCard = null;
 
 $(document).ready(function(){
 
@@ -32,6 +34,8 @@ $(document).ready(function(){
 	
 	$('#submitPage').click(submitPage);
 	
+	
+	socket.on("finished", endGame);
 	socket.on("nextCard", getNextCard);
 	
 	//socket.on("startGame", playGame);
@@ -39,6 +43,15 @@ $(document).ready(function(){
 	
 });
 
+function endGame(){
+	if (GAMESTATE!=GAMEOVER){
+		console.log("GAME IS OVER!!!!!!!!!!!!!!!!!!!!!!! GOOD WORK!")
+		$("#block1").empty();
+		$("#block2").empty();
+		$("#game").hide();
+		$("#message").append("<p>GAME OVER</p>");
+	}
+}
 
 function submitPage() {
 
@@ -55,6 +68,7 @@ function submitPage() {
 	}
 
 	data.description = description;
+	data.card = currentCard;
 	socket.emit("submission", data);
 	setToWaiting();
 	
@@ -97,6 +111,7 @@ function getNextCard(data){
 	}
 	console.log("GOT NEXT CARD!");
 	console.log(data)
+	currentCard = data;
 	GAMESTATE = PLAYING;
 	$("#message").empty();
 	
